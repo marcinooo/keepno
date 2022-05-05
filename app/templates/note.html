@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Include stylesheet -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+
+    <title>Keepno</title>
+    <style>
+      .separator {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        font-size: 0.7rem;
+        color: rgb(189, 189, 189);
+      }
+
+      .separator::before,
+      .separator::after {
+        content: '';
+        flex: 1;
+        border-bottom: 1px solid rgb(189, 189, 189);
+      }
+
+      .separator:not(:empty)::before {
+        margin-right: .25em;
+      }
+
+      .separator:not(:empty)::after {
+        margin-left: .25em;
+      }
+    </style>
+  </head>
+  <body>
+
+    <!-- PAGE HEADER START -->
+    <header class="bd-header bg-dark py-2 d-flex align-items-stretch border-bottom border-dark">
+      <div class="container-fluid d-flex align-items-center">
+        <h1 class="d-flex align-items-center fs-4 text-white mb-0">
+          <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-box" viewBox="0 0 16 16">
+            <path d="M8.186 1.113a.5.5 0 0 0-.372 0L1.846 3.5 8 5.961 14.154 3.5 8.186 1.113zM15 4.239l-6.5 2.6v7.922l6.5-2.6V4.24zM7.5 14.762V6.838L1 4.239v7.923l6.5 2.6zM7.443.184a1.5 1.5 0 0 1 1.114 0l7.129 2.852A.5.5 0 0 1 16 3.5v8.662a1 1 0 0 1-.629.928l-7.185 2.874a.5.5 0 0 1-.372 0L.63 13.09a1 1 0 0 1-.63-.928V3.5a.5.5 0 0 1 .314-.464L7.443.184z"/>
+          </svg>
+          <span> Keepno</span>
+        </h1>
+        <a class="nav-link text-white ms-auto mx-3" data-bs-toggle="offcanvas" href="#offcanvasExample" role="button" aria-controls="offcanvasExample">
+          My notes
+        </a>
+        <div class="dropdown">
+          <a href="#" class="d-flex align-items-center justify-content-center link-light text-decoration-none dropdown-toggle" id="dropdownUser3" data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="https://github.com/mdo.png" alt="mdo" width="48" height="48" class="rounded-circle">
+          </a>
+          <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser3">
+            <li><a class="dropdown-item" href="#">Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#">Sign out</a></li>
+          </ul>
+        </div>
+      </div>
+    </header>
+    <!-- PAGE HEADER END -->
+
+    <!-- SIDEBAR START -->
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasExampleLabel">My notes <span class="text-secondary">(20)</span></h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      </div>
+      <div class="d-grid gap-2 m-3">
+        <button class="btn btn-dark" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo">New note</button>
+      </div>
+      <div class="offcanvas-body">
+        <div class="d-flex flex-column align-items-stretch flex-shrink-0 bg-white" style="width: 100%;">
+          <div class="list-group list-group-flush border-bottom scrollarea">
+            <a href="#" class="list-group-item list-group-item-action py-3 lh-tight" aria-current="true" style="background-color: rgb(233, 233, 233);">
+                <div class="d-flex w-100 align-items-center justify-content-between">
+                <strong class="mb-1">List group item heading</strong>
+                <small>Wed</small>
+                </div>
+                <div class="col-10 mb-1 small">Some placeholder content in a paragraph below the heading and date.</div>
+            </a>
+            <a href="#" class="list-group-item list-group-item-action py-3 lh-tight">
+                <div class="d-flex w-100 align-items-center justify-content-between">
+                <strong class="mb-1">List group item heading</strong>
+                <small class="text-muted">Tues</small>
+                </div>
+                <div class="col-10 mb-1 small">Some placeholder content in a paragraph below the heading and date.</div>
+            </a>
+            <a href="#" class="list-group-item list-group-item-action py-3 lh-tight" aria-current="true">
+                <div class="d-flex w-100 align-items-center justify-content-between">
+                <strong class="mb-1">List group item heading</strong>
+                <small>Wed</small>
+                </div>
+                <div class="col-10 mb-1 small">Some placeholder content in a paragraph below the heading and date.</div>
+            </a>
+            <a href="#" class="list-group-item list-group-item-action py-3 lh-tight">
+                <div class="d-flex w-100 align-items-center justify-content-between">
+                <strong class="mb-1">List group item heading</strong>
+                <small class="text-muted">Tues</small>
+                </div>
+                <div class="col-10 mb-1 small">Some placeholder content in a paragraph below the heading and date.</div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- SIDEBAR END -->
+
+    <!-- MAIN PAGE START -->
+    <main>
+      <div class="px-3 pt-2" style="max-width: 800px; margin-left: auto; margin-right: auto;">
+        <div class="row">
+          <div class="col">
+            <h1 class="display-5">C++ basics</h1>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3" style="font-size: 0.8rem;">
+              <span>ipsum inventore pariatur elit. Quam, assumenda molestias Repellat saepe adipisicing Lorem consectetur, atque est? sit nisi. laboriosam, dolor amet obcaecati</span>
+              <div class="btn-toolbar mb-2 mb-md-0">
+                <div class="btn-group" role="group" aria-label="Basic example">
+                  <button class="btn btn-outline-dark btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#addEntryModal" data-bs-whatever="@mdo">Add&nbsp;entry</button>
+                  <button class="btn btn-outline-dark btn-sm" type="button" >Export</button>
+                  <button class="btn btn-outline-dark btn-sm" type="button">Share</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <!-- entries list start -->
+            <div id="entries" class="mb-3">
+              <template id="entries-template">
+                <div class="row">
+                  <div class="col">
+                    <div class="separator">3 days ago</div>
+                  </div>
+                </div>
+                <div class="row pb-3">
+                  <div class="col" style="width: 100%; padding-right: 0.3rem">
+                    <div id="content"></div>
+                  </div>
+                  <div class="col-auto" style="padding-left: 0px;">
+                    <div class="dropdown">
+                      <a class="text-dark" href="#" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="16" fill="currentColor" class="bi bi-three-dots-vertical" viewBox="0 0 10 16">
+                          <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                        </svg>
+                      </a>
+                      <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                        <li>
+                          <a class="dropdown-item" href="#">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                              <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                              <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                            </svg>
+                            Delete
+                          </a>
+                        </li>
+                        <li>
+                          <a class="dropdown-item" href="#">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
+                              <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+                            </svg>
+                            Edit
+                          </a>
+                        </li>
+                        <li>
+                          <a class="dropdown-item" href="#">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard" viewBox="0 0 16 16">
+                              <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
+                              <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
+                            </svg>
+                            Copy
+                          </a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </div>
+            <!-- entries list end -->
+          </div>
+        </div>
+        <div class="row" id="entries-loading-spiner">
+          <div class="col">
+            <div class="d-flex justify-content-center mb-3">
+              <div class="spinner-border" role="status"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <!-- MAIN PAGE END -->
+
+
+    <!-- ADD NEW ENTRY MODAL START -->
+    <div class="modal fade bd-example-modal-xl" id="addEntryModal" tabindex="-1" aria-labelledby="addEntryModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addEntryModalLabel">New note</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div id="standalone-container" styles="">
+                <div id="toolbar-container">
+                  <span class="ql-formats">
+                    <select class="ql-font"></select>
+                    <select class="ql-size"></select>
+                  </span>
+                  <span class="ql-formats">
+                    <button class="ql-bold"></button>
+                    <button class="ql-italic"></button>
+                    <button class="ql-underline"></button>
+                    <button class="ql-strike"></button>
+                  </span>
+                  <span class="ql-formats">
+                    <select class="ql-color"></select>
+                    <select class="ql-background"></select>
+                  </span>
+                  <span class="ql-formats">
+                    <button class="ql-script" value="sub"></button>
+                    <button class="ql-script" value="super"></button>
+                  </span>
+                  <span class="ql-formats">
+                    <button class="ql-header" value="1"></button>
+                    <button class="ql-header" value="2"></button>
+                    <button class="ql-blockquote"></button>
+                    <button class="ql-code-block"></button>
+                  </span>
+                  <span class="ql-formats">
+                    <button class="ql-list" value="ordered"></button>
+                    <button class="ql-list" value="bullet"></button>
+                    <button class="ql-indent" value="-1"></button>
+                    <button class="ql-indent" value="+1"></button>
+                  </span>
+                  <span class="ql-formats">
+                    <button class="ql-direction" value="rtl"></button>
+                    <select class="ql-align"></select>
+                  </span>
+                  <span class="ql-formats">
+                    <button class="ql-link"></button>
+                    <button class="ql-image"></button>
+                    <button class="ql-video"></button>
+                    <button class="ql-formula"></button>
+                  </span>
+                  <span class="ql-formats">
+                    <button class="ql-clean"></button>
+                  </span>
+                </div>
+                <div id="editor-container"></div>
+              </div>
+              <button type="button" id="save-entry" class="btn btn-sm btn-outline-secondary">Save</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary">Reach editor</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-dark">Create note</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- ADD NEW ENTRY MODAL END -->
+
+    <!-- ADD NEW NOTE MODAL START -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">New note</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="mb-3">
+                <label for="title-name" class="col-form-label">Title</label>
+                <input type="text" class="form-control" id="title-name">
+              </div>
+              <div class="mb-3">
+                <label for="short-description-text" class="col-form-label">Short description</label>
+                <textarea class="form-control" id="short-description-text"></textarea>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-dark">Create Entry </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- ADD NEW NOTE MODAL END -->
+
+    <!-- Optional JavaScript; choose one of the two! -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+
+    <!-- Option 1: Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+
+    <!-- Include the Quill library -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+
+    <script>
+        var quill = new Quill('#editor-container', {
+            modules: {
+                syntax: true,
+                toolbar: '#toolbar-container'
+            },
+            placeholder: 'Compose an epic...',
+            theme: 'snow'
+        });
+
+        const saveBtn = document.getElementById('save-entry');
+        saveBtn.addEventListener('click', function(e){
+            // var delta = quill.getContents();
+            console.log(quill.root.innerHTML);
+        })
+
+        // Get references to the dom elements
+        var scroller = document.querySelector("#entries");
+        var template = document.querySelector('#entries-template');
+        var sentinel = document.querySelector('#entries-loading-spiner');
+
+        // Set a counter to count the items loaded
+        var counter = 0;
+
+        // Function to request new items and render to the dom
+        function loadItems() {
+
+          // Use fetch to request data and pass the counter value in the QS
+          fetch(`/load?c=${counter}`).then((response) => {
+
+            // Convert the response data to JSON
+            response.json().then((data) => {
+
+              // If empty JSON, exit the function
+              if (!data.length) {
+
+                // Replace the spinner with "No more posts"
+                sentinel.innerHTML = "No more posts";
+                return;
+              }
+
+              // Iterate over the items in the response
+              for (var i = 0; i < data.length; i++) {
+
+                // Clone the HTML template
+                let template_clone = template.content.cloneNode(true);
+
+                // Query & update the template content
+                // template_clone.querySelector("#title").innerHTML = `${data[i][0]}: ${data[i][1]}`;
+                template_clone.querySelector("#content").innerHTML = data[i][2];
+
+                // Append template to dom
+                scroller.appendChild(template_clone);
+
+                // Increment the counter
+                counter += 1;
+
+
+              }
+            })
+          })
+        }
+
+        // Create a new IntersectionObserver instance
+        var intersectionObserver = new IntersectionObserver(entries => {
+
+          // Uncomment below to see the entry.intersectionRatio when
+          // the sentinel comes into view
+
+          // entries.forEach(entry => {
+          //   console.log(entry.intersectionRatio);
+          // })
+
+          // If intersectionRatio is 0, the sentinel is out of view
+          // and we don't need to do anything. Exit the function
+          if (entries[0].intersectionRatio <= 0) {
+            return;
+          }
+
+          // Call the loadItems function
+          loadItems();
+
+        });
+
+        // Instruct the IntersectionObserver to watch the sentinel
+        intersectionObserver.observe(sentinel);
+
+    </script>
+  </body>
+</html>
