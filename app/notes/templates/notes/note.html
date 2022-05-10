@@ -1,0 +1,475 @@
+{% extends "base.html" %}
+
+{% block title %}<title>Keepno</title>{% endblock %}
+
+{% block style %}
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
+<style>
+  .separator {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    font-size: 0.7rem;
+    color: rgb(189, 189, 189);
+  }
+
+  .separator::before,
+  .separator::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid rgb(189, 189, 189);
+  }
+
+  .separator:not(:empty)::before {
+    margin-right: .25em;
+  }
+
+  .separator:not(:empty)::after {
+    margin-left: .25em;
+  }
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+{% include "includes/header.html" %}
+
+<!-- MAIN PAGE START -->
+<main>
+  <div class="px-3 pt-2" style="max-width: 800px; margin-left: auto; margin-right: auto;">
+    <div class="row" style="margin-top: 60px;">
+      <div class="col">
+        <h1 class="display-5">{{ note.title }}</h1>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3" 
+             style="font-size: 0.8rem;">
+          <span>{{ note.description }}</span>
+          <div class="btn-toolbar mt-1 mb-2 mb-md-0">
+            <div class="btn-group" role="group" aria-label="Basic example">
+              <button class="btn btn-outline-dark btn-sm" type="button" data-bs-toggle="modal" 
+                      data-bs-target="#addEntryModal" data-bs-whatever="@mdo">Add&nbsp;entry</button>
+              <button class="btn btn-outline-dark btn-sm" type="button" >Export</button>
+              <button class="btn btn-outline-dark btn-sm" type="button">Share</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <!-- entries list start -->
+        <div id="entries" class="mb-3">
+          <template id="entries-template">
+            <div id="entryRow">
+              <div class="row">
+                <div class="col">
+                  <div class="separator" id="created"></div>
+                </div>
+              </div>
+              <div class="row pb-3">
+                <div class="col" style="width: 100%; padding-right: 0.3rem">
+                  <div id="content"></div>
+                </div>
+                <div class="col-auto" style="padding-left: 0px;">
+                  <div class="dropdown">
+                    <a class="text-dark" href="#" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="10" height="16" fill="currentColor" 
+                           class="bi bi-three-dots-vertical" viewBox="0 0 10 16">
+                        <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 
+                                 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                      </svg>
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                      <li>
+                        <a class="dropdown-item" id="deleteEntryLink" href="" data-bs-toggle="modal" 
+                           data-bs-target="#deleteEntryModal" data-entryid="#">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" 
+                               class="bi bi-trash" viewBox="0 0 16 16">
+                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 
+                                     .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                            <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 
+                                                         1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 
+                                                         1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 
+                                                         1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                          </svg>
+                          Delete
+                        </a>
+                      </li>
+                      <li>
+                        <a class="dropdown-item" href="#">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" 
+                               class="bi bi-pencil" viewBox="0 0 16 16">
+                            <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 
+                                     2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 
+                                     3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 
+                                     .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 
+                                     3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 
+                                     0 0 1-.468-.325z"/>
+                          </svg>
+                          Edit
+                        </a>
+                      </li>
+                      <li>
+                        <a class="dropdown-item" href="#">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" 
+                               class="bi bi-clipboard" viewBox="0 0 16 16">
+                            <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 
+                                     0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
+                            <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 
+                                     .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 
+                                     2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
+                          </svg>
+                          Copy
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </template>
+        </div>
+        <!-- entries list end -->
+      </div>
+    </div>
+    <div class="row" id="entries-loading-spiner">
+      <div class="col">
+        <div class="d-flex justify-content-center mb-3">
+          <div class="spinner-border" role="status"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+<!-- MAIN PAGE END -->
+
+
+<!-- ADD NEW ENTRY MODAL START -->
+<div class="modal fade bd-example-modal-xl" id="addEntryModal" tabindex="-1" 
+     aria-labelledby="addEntryModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addEntryModalLabel">New Entry</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div id="standalone-container" styles="">
+            <div id="toolbar-container">
+              <span class="ql-formats">
+                <select class="ql-font"></select>
+                <select class="ql-size"></select>
+              </span>
+              <span class="ql-formats">
+                <button class="ql-bold"></button>
+                <button class="ql-italic"></button>
+                <button class="ql-underline"></button>
+                <button class="ql-strike"></button>
+              </span>
+              <span class="ql-formats">
+                <select class="ql-color"></select>
+                <select class="ql-background"></select>
+              </span>
+              <span class="ql-formats">
+                <button class="ql-script" value="sub"></button>
+                <button class="ql-script" value="super"></button>
+              </span>
+              <span class="ql-formats">
+                <button class="ql-header" value="1"></button>
+                <button class="ql-header" value="2"></button>
+                <button class="ql-blockquote"></button>
+                <button class="ql-code-block"></button>
+              </span>
+              <span class="ql-formats">
+                <button class="ql-list" value="ordered"></button>
+                <button class="ql-list" value="bullet"></button>
+                <button class="ql-indent" value="-1"></button>
+                <button class="ql-indent" value="+1"></button>
+              </span>
+              <span class="ql-formats">
+                <button class="ql-direction" value="rtl"></button>
+                <select class="ql-align"></select>
+              </span>
+              <span class="ql-formats">
+                <button class="ql-link"></button>
+                <button class="ql-image"></button>
+                <button class="ql-video"></button>
+                <button class="ql-formula"></button>
+              </span>
+              <span class="ql-formats">
+                <button class="ql-clean"></button>
+              </span>
+            </div>
+            <div id="editor-container"></div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" id="save-entry" class="btn btn-dark">Add Entry</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ADD NEW ENTRY MODAL END -->
+
+<!-- DELETE ENTRY MODAL START -->
+<div class="modal fade" id="deleteEntryModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Entry will be deleted</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Do you want to delete this entry?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" id="deleteEntryButton" class="btn btn-dark" data-entryid="#">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- DELETE ENTRY MODAL END -->
+
+{% endblock %}
+
+
+{% block js %}
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+<script src="{{ url_for('static', filename='js/moment.js') }}"></script>
+
+<script>
+  window.addEventListener('load', function() {
+    const noteId = "{{ note.id }}";
+    const entriesScroller = document.querySelector("#entries");
+    const entriesTemplate = document.querySelector('#entries-template');
+    const entriesLoadingSpiner = document.querySelector('#entries-loading-spiner');
+    const addEntryModal = new bootstrap.Modal(document.querySelector('#addEntryModal'));
+    const deleteEntryModal = document.querySelector('#deleteEntryModal');
+    const deleteEntryModalObject = new bootstrap.Modal(deleteEntryModal);
+    const deleteEntryButton = deleteEntryModal.querySelector('#deleteEntryButton');
+    const saveBtn = document.querySelector('#save-entry');
+    let nextEpage = 1;
+    let hasNextEntries = true;
+
+    /** Event triggered to load few entries from database to fill opened page. */
+    const loadEntriesAfterPageOpeningEvent = new Event('loadEntriesAfterPageOpeningEvent');
+
+    /** QUILL Editor */
+    const quill = new Quill('#editor-container', {
+      modules: {
+        syntax: true,
+        toolbar: '#toolbar-container'
+      },
+      placeholder: 'Compose an epic...',
+      theme: 'snow'
+    });
+
+
+
+    /**
+     * Fills passed template with entry's data
+     * @param template template to fill
+     * @param entry entry object
+     * @returns filled template
+     */
+     function fillEntryTemplateClone(template, entry) {
+      template.querySelector("#content").innerHTML = entry.content;
+      template.querySelector("#created").innerHTML = moment(entry.created).fromNow();
+      const deleteEntryLink = template.querySelector("#deleteEntryLink");
+      deleteEntryLink.id = `deleteMobalOpenButton${entry.id}`;
+      deleteEntryLink.dataset.entryid = entry.id;
+      const entryRow = template.querySelector("#entryRow");
+      entryRow.id = `entry${entry.id}`;
+      return template
+    }
+
+
+    /** 
+     * Adds single entry as last element in entryScroller container.
+     * @param entry entry to add
+     * @param template template with html structure for single entry
+     * @param scroller container for list of entries
+     */  
+    function addEntryToTheBottomOfEntryScroller(entry, template, scroller) {
+      let template_clone = template.content.cloneNode(true);
+      template_clone = fillEntryTemplateClone(template_clone, entry);
+      scroller.appendChild(template_clone);
+    }
+
+
+    /** 
+     * Adds single entry as first element in entriesScroller container.
+     * @param entry entry to add
+     * @param template template with html structure for single entry
+     * @param scroller container for list of entries
+     */
+    function addEntryToTheTopOfEntryScroller(entry, template, scroller) {
+      let template_clone = template.content.cloneNode(true);
+      template_clone = fillEntryTemplateClone(template_clone, entry)
+      scroller.insertBefore(template_clone, scroller.firstChild.nextSibling);  // to check
+    }
+
+
+    /**
+     * Checks if document's scrollbar is visible.
+     * @returns true if scrollbar is visible, otherwise false
+     */
+    function documentScrollbarIsActive() {
+      return document.documentElement.scrollHeight > document.documentElement.clientHeight;
+    }
+
+
+    /**
+     * Unpack received entries.
+     * @param data data recived from server
+     */
+    function unpackReceivedEntriesData(data) {
+      for (let i = 0; i < data.entries.length; i++) {
+        addEntryToTheBottomOfEntryScroller(data.entries[i], entriesTemplate, entriesScroller)
+      }
+      if (data.has_next) {
+        nextEpage = data.next_num;
+        hasNextEntries = true;
+      } else {
+        hasNextEntries = false;
+        entriesLoadingSpiner.style.display = "none";
+      }
+    }
+
+
+    /** 
+     * Observer for entry section. It triggers get request to obtain new entries when user is scrolling list of entries. 
+     */        
+    const intersectionObserver = new IntersectionObserver(entries => {
+      if (entries[0].intersectionRatio <= 0) { return; }
+      if (hasNextEntries) {
+        fetch(`/api/notes/${noteId}/entries?epage=${nextEpage}`)
+        .then(function(response) {
+          return response.json();
+        })
+        .then(function(data) {
+          unpackReceivedEntriesData(data);
+        })
+        .catch(function (error) {
+          console.log(error);
+          alert.error("There was a problem. Entries couldn't be downloaded.");
+        });
+      }
+    });
+
+
+    /**
+     * 'loadEntriesAfterPageOpeningEvent' event listener which triggers get request to obtain new entries to fill opened page.
+     */
+    document.addEventListener('loadEntriesAfterPageOpeningEvent', function(event ) {
+      if (hasNextEntries) {
+        fetch(`/api/notes/${noteId}/entries?epage=${nextEpage}`)
+        .then(function(response) {
+          return response.json();
+        })
+        .then(function(data) {
+          unpackReceivedEntriesData(data);
+          if (! documentScrollbarIsActive()) {
+            document.dispatchEvent(loadEntriesAfterPageOpeningEvent);
+          } else {
+            intersectionObserver.observe(entriesLoadingSpiner);
+          }
+        })
+        .catch(function (error) {
+          console.log(error);
+          alert.error("There was a problem. Entries couldn't be downloaded.");
+        });
+      }
+    });
+
+    
+    /**
+     * 'click' event listener which triggers post request to add new entry.
+     */
+    saveBtn.addEventListener('click', function(e){
+      // Check if user entered data
+      const entryContent = quill.root.innerHTML.trim() === '<p><br></p>' ? "" : quill.root.innerHTML;
+      fetch(`/api/notes/${noteId}/entries`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({content: entryContent, note_id: noteId}),
+      })
+      .then(function(response){
+        return response.json();
+      })
+      .then(function(data) {
+        if (data.entry) {
+          addEntryToTheTopOfEntryScroller(data.entry, entriesTemplate, entriesScroller)
+          quill.root.innerHTML = '';
+          addEntryModal.hide();
+          alert.success("New entry has been added successfully!");
+        } else {
+          const errorMessage = unpackReceivedError(data.error, 'Your entry was not deleted:<br/>');
+          alert.error(errorMessage);
+        }
+      })
+      .catch(function(error) {
+        console.log(error);
+        alert.error("There was a problem. The entry was not added!");
+      });
+    })
+
+
+    /**
+     * 'show.bs.modal' event listener which reads entry id and passes it to delete confirmation button.
+     */
+    deleteEntryModal.addEventListener('show.bs.modal', function(event) {
+      const button = event.relatedTarget;
+      const entryId = button.getAttribute('data-entryid');
+      deleteEntryButton.dataset.entryid = entryId;
+    });
+
+
+    /**
+     * 'click' event listener which triggers delete request to delete entry.
+     */
+    deleteEntryButton.addEventListener('click', function(event) {
+      fetch(`/api/notes/${noteId}/entries/${event.target.dataset.entryid}`, {
+        method: 'DELETE',
+      })
+      .then(function(response) {
+        return response.json();
+      })
+      .then(function(data) {
+        if (data.entry) {
+          const entryElement = document.getElementById(`entry${event.target.dataset.entryid}`);
+          deleteEntryModalObject.hide();
+          entryElement.remove();
+          alert.success("Entry has been deleted successfully!");
+        } else {
+          const errorMessage = unpackReceivedError(data.error, 'Your entry was not deleted:<br/>');
+          alert.error(errorMessage);
+        }
+      })
+      .catch(function (error) {
+        console.log(error);
+        alert.error("There was a problem. couldn't be downloaded.");
+      });
+    })
+
+    // Trigger first event to obtain first notes.
+    document.dispatchEvent(loadEntriesAfterPageOpeningEvent);
+  });
+</script>
+
+<script src="{{ url_for('static', filename='js/header.js') }}"></script>
+
+{% endblock %}

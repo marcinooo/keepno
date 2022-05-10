@@ -1,0 +1,8 @@
+Flask
+Faker
+Flask-SQLAlchemy
+Flask-Migrate
+click
+psycopg2-binary
+flask-marshmallow
+marshmallow-sqlalchemy

@@ -1,0 +1,88 @@
+<!-- PAGE HEADER START -->
+<header class="bd-header bg-dark py-2 d-flex align-items-stretch border-bottom border-dark fixed-top">
+  <div class="container-fluid d-flex align-items-center">
+    <h1 class="d-flex align-items-center fs-4 text-white mb-0">
+      <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-box" viewBox="0 0 16 16">
+        <path d="M8.186 1.113a.5.5 0 0 0-.372 0L1.846 3.5 8 5.961 14.154 3.5 8.186 1.113zM15 4.239l-6.5 2.6v7.922l6.5-2.6V4.24zM7.5 14.762V6.838L1 4.239v7.923l6.5 2.6zM7.443.184a1.5 1.5 0 0 1 1.114 0l7.129 2.852A.5.5 0 0 1 16 3.5v8.662a1 1 0 0 1-.629.928l-7.185 2.874a.5.5 0 0 1-.372 0L.63 13.09a1 1 0 0 1-.63-.928V3.5a.5.5 0 0 1 .314-.464L7.443.184z"/>
+      </svg>
+      <span> Keepno</span>
+    </h1>
+    <a class="nav-link text-white ms-auto mx-3" data-bs-toggle="offcanvas" href="#offcanvasExample" role="button" aria-controls="offcanvasExample">
+      My notes
+    </a>
+    <div class="dropdown">
+      <a href="#" class="d-flex align-items-center justify-content-center link-light text-decoration-none dropdown-toggle" id="dropdownUser3" data-bs-toggle="dropdown" aria-expanded="false">
+        <img src="https://github.com/mdo.png" alt="mdo" width="48" height="48" class="rounded-circle">
+      </a>
+      <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser3">
+        <li><a class="dropdown-item" href="#">Profile</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item" href="#">Sign out</a></li>
+      </ul>
+    </div>
+  </div>
+</header>
+<!-- PAGE HEADER END -->
+  
+<!-- SIDEBAR START -->
+<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="offcanvasExampleLabel">My notes<span class="text-secondary"> ({{ number_of_notes }})</span></h5>
+    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="d-grid gap-2 m-3">
+    <button class="btn btn-dark" type="button" data-bs-toggle="modal" data-bs-target="#addNoteModal" data-bs-whatever="@mdo">New note</button>
+  </div>
+  <div class="offcanvas-body" id="sidebarBody">
+    <div class="d-flex flex-column align-items-stretch flex-shrink-0 bg-white" style="width: 100%;">
+      <div id="notes">
+        <template id="notesTemplate">
+          <div class="list-group list-group-flush border-bottom scrollarea">
+            <a href="#" id="noteLink" class="list-group-item list-group-item-action py-3 lh-tight" aria-current="true">
+                <div class="d-flex w-100 align-items-center justify-content-between">
+                  <strong class="mb-1" id="noteTitle"></strong>
+                  <small id="noteDate" style="font-size: 0.7rem;"></small>
+                </div>
+                <div class="d-flex w-100 mb-1 small ml-1 mr-1" id="noteDescription"></div>
+            </a>
+          </div>
+        </template>
+      </div>
+    </div>
+    <div id="notesLoadingSpiner">
+      <div class="d-flex justify-content-center my-3">
+        <div class="spinner-border" role="status"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- SIDEBAR END -->
+
+<!-- ADD NEW NOTE MODAL START -->
+<div class="modal fade" id="addNoteModal" tabindex="-1" aria-labelledby="addNoteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="addNoteForm">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addNoteModalLabel">New note</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="newNoteTitle" class="col-form-label">Title</label>
+            <input type="text" class="form-control" id="newNoteTitle">
+          </div>
+          <div class="mb-3">
+            <label for="newNoteDescription" class="col-form-label">Short description</label>
+            <textarea class="form-control" id="newNoteDescription"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-dark">Create Note</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<!-- ADD NEW NOTE MODAL END -->
