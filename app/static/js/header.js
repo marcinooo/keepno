@@ -166,7 +166,7 @@ window.addEventListener('load', function() {
     .then(function(data) {
       if (data.note) {
         addNoteModal.hide();
-        addNoteToTheTopOfNoteScroller(data['note'], notesTemplate, notesScroller)
+        addNoteToTheTopOfNoteScroller(data['note'], notesTemplate, notesScroller);
         alert.success("New note has been added successfully!");
       } else {
         const message = unpackReceivedError(data.error, 'Your note was not added:<br/>');

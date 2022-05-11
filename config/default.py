@@ -5,10 +5,13 @@ from pathlib import Path
 # Secret key
 SECRET_KEY = os.environ.get('FLASK_SECRET_KEY')
 
+
 # Root project directory
-BASEDIR = Path(__file__).parent.absolute() / '..'
+BASEDIR = Path(__file__).parent.parent.resolve()
+
 
 FLASK_DEBUG = os.environ.get('FLASK_DEBUG')
+
 
 SQLALCHEMY_DATABASE_USER = os.environ.get('SQLALCHEMY_DATABASE_USER')
 SQLALCHEMY_DATABASE_PASSWORD = os.environ.get('SQLALCHEMY_DATABASE_PASSWORD')
@@ -18,6 +21,10 @@ SQLALCHEMY_DATABASE_DB = os.environ.get('SQLALCHEMY_DATABASE_DB')
 
 SQLALCHEMY_DATABASE_URI = f'postgresql://{SQLALCHEMY_DATABASE_USER}:{SQLALCHEMY_DATABASE_PASSWORD}' \
                           f'@{SQLALCHEMY_DATABASE_HOST}:{SQLALCHEMY_DATABASE_PORT}/{SQLALCHEMY_DATABASE_DB}'
+
+
+MEDIA_ROOT = Path(BASEDIR) / 'app' / 'media'
+
 
 NOTES_PER_PAGE = 5
 ENTRIES_PER_PAGE = 2

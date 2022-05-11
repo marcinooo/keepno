@@ -1,5 +1,6 @@
 from marshmallow_sqlalchemy import auto_field, fields
-from marshmallow import post_load, ValidationError
+from marshmallow import pre_load, post_load, ValidationError
+
 from ..app import ma
 from .models import Entry, Note
 

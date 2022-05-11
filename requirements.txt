@@ -6,3 +6,4 @@ click
 psycopg2-binary
 flask-marshmallow
 marshmallow-sqlalchemy
+beautifulsoup4

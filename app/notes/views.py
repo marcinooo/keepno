@@ -1,5 +1,7 @@
 import json
-from flask import Blueprint, render_template, current_app, request, jsonify, make_response, abort, request
+from flask import (
+    Blueprint, render_template, current_app, request, jsonify, make_response, abort, request, send_from_directory
+)
 from flask.wrappers import Response
 from marshmallow.exceptions import ValidationError
 
@@ -102,3 +104,8 @@ def delete_entry(note_id: int, entry_id: int) -> Response:
         entry.delete_from_db()
         return make_response(jsonify(response), 200)
     return make_response(jsonify({'error': 'Entry doesnot exist'}), 404)
+
+
+@notes_blueprint.route('/media/<filename>')
+def media(filename):
+    return send_from_directory(current_app.config['MEDIA_ROOT'], filename)

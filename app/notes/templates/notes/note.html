@@ -417,7 +417,7 @@
           addEntryModal.hide();
           alert.success("New entry has been added successfully!");
         } else {
-          const errorMessage = unpackReceivedError(data.error, 'Your entry was not deleted:<br/>');
+          const errorMessage = unpackReceivedError(data.error, 'Your entry was not added:<br/>');
           alert.error(errorMessage);
         }
       })
@@ -461,7 +461,7 @@
       })
       .catch(function (error) {
         console.log(error);
-        alert.error("There was a problem. couldn't be downloaded.");
+        alert.error("There was a problem. Entry couldn't be deleted.");
       });
     })
 
