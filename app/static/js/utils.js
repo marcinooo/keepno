@@ -7,6 +7,9 @@
  function unpackReceivedError(error, header) {
   const keys = Object.keys(error);
   let message = header + '<ul>';
+  if(typeof error === 'string') {
+    return message + '<li>' + error + '</li></ul>';
+  }
   for (let i = 0; i < keys.length; i++) {
     message += '<li>';
     if (error[keys[i]].length == 1) {

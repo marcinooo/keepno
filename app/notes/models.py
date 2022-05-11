@@ -13,7 +13,8 @@ from bs4 import BeautifulSoup
 from flask import current_app
 
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.orm import validates
+from sqlalchemy.orm import validates, reconstructor
+from sqlalchemy import and_
 
 from ..app import db
 
@@ -56,7 +57,7 @@ class Note(BaseMixin, db.Model):
     title = db.Column(db.String(100), unique=True, nullable=False)
     description = db.Column(db.String(240))
     created = db.Column(db.DateTime(), default=datetime.datetime.utcnow)
-    updated = db.Column(db.DateTime(), default=datetime.datetime.utcnow)
+    updated = db.Column(db.DateTime(), default=datetime.datetime.utcnow)  # onupdate=datetime.datetime.utcnow
 
     @classmethod
     def count(cls) -> int:
@@ -73,21 +74,32 @@ class Entry(BaseMixin, db.Model):
     updated = db.Column(db.DateTime(), default=datetime.datetime.utcnow)
 
     def __init__(self, **kwargs) -> None:
-        self._content_images = []
+        self._content_images_to_save = []
+        self._content_images_to_delete = []
         super(Entry, self).__init__(**kwargs)
+
+    @reconstructor
+    def init_on_load(self):
+        self._content_images_to_save = []
+        self._content_images_to_delete = []
 
     @classmethod
     def get_by_note_id(cls, _id: int) -> List[Entry]:
         """Gets single object by related note id from database."""
         return cls.query.filter_by(note_id=_id).all()
-
+    
     def save_to_db(self) -> Entry:
         """Saves object to database."""
         super().save_to_db()
         self.content = self._validate_content_before_saving()
-        if self._content_images:
-            for image in self._content_images:
+        if self._content_images_to_save:
+            for image in self._content_images_to_save:
                 image.save()
+        if self._content_images_to_delete:
+            for image in self._content_images_to_delete:
+                image.delete()
+        self._content_images_to_save = []
+        self._content_images_to_delete = []
         return self
 
     def delete_from_db(self) -> Entry:
@@ -101,26 +113,52 @@ class Entry(BaseMixin, db.Model):
     def _validate_content_before_saving(self) -> str:
         """Finds all images passed as base64 string in entry content and saves it in local os."""
         soup = BeautifulSoup(self.content)
+        already_saved_content_images_ids = []
         for img in soup.findAll('img'):
             src = img['src']
-            image_name = uuid.uuid4().hex + '.png'
-            entry_content_image = EntryContentImage(base64_string=src[22:].encode('utf-8'), 
-                                                    name=image_name, 
-                                                    entry_id=self.id)
-            self._content_images.append(entry_content_image)
-            img['src'] = '/media/' + image_name
+            if 'data:image/png;base64' in src:
+                unique_image_string = uuid.uuid4().hex
+                image_name = unique_image_string + '.png'
+                entry_content_image = EntryContentImage(base64_string=src[22:].encode('utf-8'), 
+                                                        name=image_name, 
+                                                        entry_id=self.id)
+                self._content_images_to_save.append(entry_content_image)
+                img['src'] = '/media/' + image_name
+                img['id'] = unique_image_string
+            elif '/media/' in src:
+                image_name = Path(src).name
+                entry_content_image = EntryContentImage.get_by_name(image_name)
+                if entry_content_image:
+                    already_saved_content_images_ids.append(entry_content_image.id)
+        self._content_images_to_delete = EntryContentImage.get_by_ids_which_are_not_in(
+            self.id,
+            already_saved_content_images_ids
+        )
         return str(soup)
 
 
 class EntryContentImage(BaseMixin, db.Model):
     """Creates object which represents image from entry content."""
     __tablename__ = 'entrycontentimages'
-    name = db.Column(db.String(50), nullable=False)
+    name = db.Column(db.String(50), nullable=False)  # add unique
     entry_id = db.Column(db.Integer, db.ForeignKey('entries.id'), nullable=False)
 
-    def __init__(self, base64_string: str, **kwargs) -> None:
+    def __init__(self, base64_string: str = '', **kwargs) -> None:
         super(EntryContentImage, self).__init__(**kwargs)
         self.base64_string = base64_string
+
+    @classmethod
+    def get_by_name(cls, name: str) -> EntryContentImage:
+        """Gets single object by name from database."""
+        return cls.query.filter_by(name=name).first()
+
+    @classmethod
+    def get_by_ids_which_are_not_in(cls, _id: int, ids: List[int]) -> List[EntryContentImage]:
+        """Gets all objects with id not on the passed list."""
+        entry_content_images = cls.query.filter(
+            and_(EntryContentImage.id.notin_(ids), EntryContentImage.entry_id == _id)
+        ).all()
+        return entry_content_images
 
     @classmethod
     def get_by_entry_id(cls, _id: int) -> List[EntryContentImage]:
@@ -142,6 +180,8 @@ class EntryContentImage(BaseMixin, db.Model):
 
     def dump_base64_string_to_image(self, path: Path) -> None:
         """Saves image in local os."""
+        if not self.base64_string:
+            raise TypeError('base64_string is needed to save image')
         with open(path, "wb") as fh:
             fh.write(base64.decodebytes(self.base64_string))
 
