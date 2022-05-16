@@ -55,7 +55,7 @@
             <div class="btn-group" role="group" aria-label="Basic example">
               <button class="btn btn-outline-dark btn-sm" type="button" data-bs-toggle="modal" 
                       data-bs-target="#addEntryModal" data-bs-whatever="@mdo">Add&nbsp;entry</button>
-              <button class="btn btn-outline-dark btn-sm" type="button" >Export</button>
+              <a role="button" class="btn btn-outline-dark btn-sm" href="{{ url_for('notes.note_export', note_id=note.id) }}">Export</a>
               <button class="btn btn-outline-dark btn-sm" type="button">Share</button>
             </div>
           </div>
@@ -324,7 +324,7 @@
 
 
     /**
-     * Unpack received entries.
+     * Unpacks received entries.
      * @param data data recived from server
      */
     function unpackReceivedEntriesData(data) {

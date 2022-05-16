@@ -1,6 +1,4 @@
-"""
-Contains models for notes blueprint.
-"""
+"""Contains models for database."""
 
 from __future__ import annotations
 
@@ -57,7 +55,8 @@ class Note(BaseMixin, db.Model):
     title = db.Column(db.String(100), unique=True, nullable=False)
     description = db.Column(db.String(240))
     created = db.Column(db.DateTime(), default=datetime.datetime.utcnow)
-    updated = db.Column(db.DateTime(), default=datetime.datetime.utcnow)  # onupdate=datetime.datetime.utcnow
+    updated = db.Column(db.DateTime(), default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+    pdf_note = db.relationship('PdfNote', uselist=False, backref="note", cascade="all, delete")
 
     @classmethod
     def count(cls) -> int:
@@ -71,7 +70,7 @@ class Entry(BaseMixin, db.Model):
     content = db.Column(db.Text(), nullable=False)
     note_id = db.Column(db.Integer, db.ForeignKey('notes.id'), nullable=False)
     created = db.Column(db.DateTime(), default=datetime.datetime.utcnow)
-    updated = db.Column(db.DateTime(), default=datetime.datetime.utcnow)
+    updated = db.Column(db.DateTime(), default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
 
     def __init__(self, **kwargs) -> None:
         self._content_images_to_save = []
@@ -85,8 +84,18 @@ class Entry(BaseMixin, db.Model):
 
     @classmethod
     def get_by_note_id(cls, _id: int) -> List[Entry]:
-        """Gets single object by related note id from database."""
+        """Gets single object by related entry id from database."""
         return cls.query.filter_by(note_id=_id).all()
+
+    @classmethod
+    def get_by_note_id_in_order_of_creation(cls, _id: int) -> List[Entry]:
+        """."""
+        return cls.query.filter_by(note_id=_id).order_by(Entry.updated.desc()).all()
+
+    @classmethod
+    def count_for_given_note_id(cls, _id: int) -> int:
+        """Counts all objects in database for given note id."""
+        return cls.query.filter_by(note_id=_id).count()
     
     def save_to_db(self) -> Entry:
         """Saves object to database."""
@@ -117,22 +126,23 @@ class Entry(BaseMixin, db.Model):
         for img in soup.findAll('img'):
             src = img['src']
             if 'data:image/png;base64' in src:
-                unique_image_string = uuid.uuid4().hex
-                image_name = unique_image_string + '.png'
-                entry_content_image = EntryContentImage(base64_string=src[22:].encode('utf-8'), 
-                                                        name=image_name, 
-                                                        entry_id=self.id)
+                id_ = uuid.uuid4().hex
+                name = id_ + '.png'
+                current_date = datetime.datetime.utcnow().date()
+                path = f'notes/img/{current_date.year}/{current_date.month}/{current_date.day}'
+                entry_content_image = EntryContentImage(
+                    base64_string=src[22:].encode('utf-8'), path=path, name=name, entry_id=self.id
+                )
                 self._content_images_to_save.append(entry_content_image)
-                img['src'] = '/media/' + image_name
-                img['id'] = unique_image_string
+                img['src'] = f'/media/{path}/{name}'
+                img['id'] = id_
             elif '/media/' in src:
-                image_name = Path(src).name
-                entry_content_image = EntryContentImage.get_by_name(image_name)
+                name = Path(src).name
+                entry_content_image = EntryContentImage.get_by_name(name)
                 if entry_content_image:
                     already_saved_content_images_ids.append(entry_content_image.id)
         self._content_images_to_delete = EntryContentImage.get_by_ids_which_are_not_in(
-            self.id,
-            already_saved_content_images_ids
+            self.id, already_saved_content_images_ids
         )
         return str(soup)
 
@@ -141,6 +151,7 @@ class EntryContentImage(BaseMixin, db.Model):
     """Creates object which represents image from entry content."""
     __tablename__ = 'entrycontentimages'
     name = db.Column(db.String(50), nullable=False)  # add unique
+    path = db.Column(db.String(50), nullable=False)
     entry_id = db.Column(db.Integer, db.ForeignKey('entries.id'), nullable=False)
 
     def __init__(self, base64_string: str = '', **kwargs) -> None:
@@ -167,6 +178,7 @@ class EntryContentImage(BaseMixin, db.Model):
 
     def save(self) -> EntryContentImage:
         """Saves object to database and image in local os."""
+        self.create_image_directory()
         self.dump_base64_string_to_image(path=self.get_image_path())
         self.save_to_db()
         return self
@@ -187,4 +199,30 @@ class EntryContentImage(BaseMixin, db.Model):
 
     def get_image_path(self) -> Path:
         """Returns path to image in local os."""
-        return Path(current_app.config['MEDIA_ROOT']) / self.name
+        return Path(current_app.config['MEDIA_ROOT']) / self.path / self.name
+
+    def create_image_directory(self):
+        path = current_app.config['MEDIA_ROOT'] / self.path
+        path.mkdir(parents=True, exist_ok=True)
+
+
+class PdfNote(BaseMixin, db.Model):
+    """Creates pdf note object."""
+    __tablename__ = 'pdfnotes'
+    pdf_name = db.Column(db.String(100), unique=True, nullable=False)
+    created = db.Column(db.DateTime(), default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)  # wywal to
+    note_id = db.Column(db.Integer, db.ForeignKey('notes.id'))
+
+    def refresh_creation_date(self):
+        self.created = datetime.datetime.utcnow()
+        self.save_to_db()
+
+    @classmethod
+    def get_by_pdf_name(cls, pdf_name: str) -> PdfNote:
+        """Gets single object by pdf name from database."""
+        return cls.query.filter_by(pdf_name=pdf_name).first()
+
+    @classmethod
+    def get_by_note_id(cls, _id: int) -> PdfNote:
+        """Gets single object by related note id from database."""
+        return cls.query.filter_by(note_id=_id).first()

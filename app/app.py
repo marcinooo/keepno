@@ -1,9 +1,12 @@
+"""Contains two main functions to create keepno app."""
+
 import os
 from flask import Flask, render_template
 from pathlib import Path
 from dotenv import load_dotenv
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
+from celery import Celery
 
 
 db = SQLAlchemy()
@@ -37,5 +40,30 @@ def create_app() -> Flask:
     app.register_blueprint(notes_blueprint)
 
     return app
+
+
+def create_celery_app(app=None):
+    """
+    Create a new Celery object and tie together the Celery config to the app's
+    config. Wrap all tasks in the context of the application.
+    :param app: Flask app
+    :return: Celery app
+    """
+    app = app or create_app()
+
+    celery = Celery(app.import_name)
+    celery.conf.update(app.config.get('CELERY_CONFIG', {}))
+    TaskBase = celery.Task
+
+    class ContextTask(TaskBase):
+        abstract = True
+
+        def __call__(self, *args, **kwargs):
+            with app.app_context():
+                return TaskBase.__call__(self, *args, **kwargs)
+
+    celery.Task = ContextTask
+    return celery
+
 
 from .notes import models as notes_models

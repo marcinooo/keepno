@@ -64,8 +64,7 @@ window.addEventListener('load', function() {
    */
   function getNoteIdFromUrl() {
     const url = window.location.href;
-    const lastIndexOfSlash = url.lastIndexOf('/');
-    const noteId = url.slice(lastIndexOfSlash+1).match(/^[0-9]+/g);
+    const noteId = url.match(/notes\/\d+/g)[0].split('/')[1];
     if (noteId.length > 0) {
       return noteId[0]
     }

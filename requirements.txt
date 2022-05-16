@@ -7,3 +7,7 @@ psycopg2-binary
 flask-marshmallow
 marshmallow-sqlalchemy
 beautifulsoup4
+redis
+celery
+python-dotenv
+pdfkit

@@ -1,15 +1,75 @@
 version: '3.9'
 services:
+
+  flask:
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile
+    container_name: flask
+    command: >
+      bash -c "./scripts/wait_for_postgres.sh
+      && python manage.py create_db
+      && python manage.py create_notes 15
+      && python manage.py create_entries 150
+      && flask run --host=0.0.0.0"
+    ports:
+      - 5000:5000
+    environment:
+      - PYTHONUNBUFFERED=1
+      - FLASK_ENV=development
+      - FLASK_APP=app:create_app()
+    volumes:
+      - ../:/var/wwww
+    networks:
+      - keepno
+    depends_on:
+      - postgres
+      - redis
+      - worker
+
   postgres:
     image: postgres:13-alpine
-    volumes:
-      - postgres_data:/var/lib/postgresql/data/
+    container_name: postgres
     ports:
       - 5432:5432
     environment:
       - POSTGRES_USER=keepno
       - POSTGRES_PASSWORD=keepno
       - POSTGRES_DB=keepno
+    networks:
+      - keepno
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+
+  redis:
+    image: "redis:alpine"
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - keepno
+    volumes:
+      - "redis:/data"
+
+  worker:
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile
+    environment:
+      - FLASK_ENV=development
+    command: celery -A app.celery worker -B -l info
+    depends_on:
+      - "redis"
+    restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
+    stop_grace_period: "${DOCKER_STOP_GRACE_PERIOD:-3s}"
+    networks:
+      - keepno
+    volumes:
+      - ../:/var/wwww
 
 volumes:
   postgres_data:
+  redis:
+
+networks:
+  keepno:
