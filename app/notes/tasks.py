@@ -7,7 +7,7 @@ from flask import current_app
 
 from ..celery import celery
 from .models import Note, Entry, PdfNote
-from .pdf_note_generator import PdfNoteGenerator
+from .pdf_note_builder import PdfNoteBuilder
 
 
 @celery.task(bind=True)
@@ -18,17 +18,17 @@ def generate_note_pdf(task, note_id):
     :param note_id: id of note
     :return: task's result
     """
-    task = PdfNoteGeneratorTask(task)
+    task = PdfNoteGenerationTask(task)
     task.run(note_id)
     return task.result
 
 
-class PdfNoteGeneratorTask:
+class PdfNoteGenerationTask:
     """Class creates object which generates new pdf note file and notices progress of generation."""
 
     def __init__(self, task):
         self.task = task
-        self.pdf_note_generator = PdfNoteGenerator(
+        self.pdf_note_generator = PdfNoteBuilder(
             'note.html', 'entry.html', self._get_templates_path()
         )
         self.result = None

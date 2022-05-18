@@ -9,8 +9,8 @@ from .models import Note, Entry
 from .shemas import entry_schema
 
 
-class PdfNoteGenerator:
-    """Creates pdf generator for note data."""
+class PdfNoteBuilder:
+    """Creates pdf for given note and entries."""
 
     options = {
         'page-size': 'Letter',
@@ -31,24 +31,26 @@ class PdfNoteGenerator:
 
     def add_header(self, note: Note) -> None:
         """
-        Dumps note data to output file.
+        Dumps note title and description to output file.
         :param note: note with title and short description attributes to dump in pdf
-        :return: None
+        :return: self object
         """
         self._template = self._environment.get_template(self.note_template_path)
         self._template = self._render_template({'note': note})
+        return self
 
     def add_entry(self, entry: Entry) -> None:
         """
-        Dumps entry data to output file.
+        Dumps entry data to template.
         :param entry: entry with content and date of creations (created) attributes to dump in pdf
-        :return: None
+        :return: self object
         """
-        if self._template is None:
+        if self._template is None: # change it
             raise Exception('Header is not added')
         entry_template = self._environment.get_template(self.entry_template_path)
         filled_entry_template = entry_template.render({'entry': self._dump_entry(entry)})
         self._template = self._render_template({'entry_template': filled_entry_template})
+        return self
 
     def render(self, name: str) -> None:
         """
@@ -82,7 +84,8 @@ class PdfNoteGenerator:
         file_loader = FileSystemLoader(search_path)
         return Environment(loader=file_loader, undefined=DebugUndefined)
 
-    def _dump_entry(self, entry: Entry) -> dict:
+    @staticmethod
+    def _dump_entry(entry: Entry) -> dict:
         """
         Dumps Entry object to dict and replace all paths in src attribute of entry content.
         :param entry: Entry object
