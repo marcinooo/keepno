@@ -6,11 +6,17 @@ from pathlib import Path
 from dotenv import load_dotenv
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
+from flask_bcrypt import Bcrypt
+from flask_login import LoginManager
+from flask_mail import Mail
 from celery import Celery
 
 
 db = SQLAlchemy()
 ma = Marshmallow()
+bcrypt = Bcrypt()
+login_manager = LoginManager()
+mail = Mail()
 
 
 def create_app() -> Flask:
@@ -35,9 +41,15 @@ def create_app() -> Flask:
 
     db.init_app(app)
     ma.init_app(app)
+    bcrypt.init_app(app)
+    login_manager.init_app(app)
+    login_manager.login_view = 'accounts.login'
+    mail.init_app(app)
 
     from .notes import notes_blueprint
+    from .accounts import accounts_blueprint
     app.register_blueprint(notes_blueprint)
+    app.register_blueprint(accounts_blueprint)
 
     return app
 
@@ -67,3 +79,4 @@ def create_celery_app(app=None):
 
 
 from .notes import models as notes_models
+from .accounts import models as accounts_models

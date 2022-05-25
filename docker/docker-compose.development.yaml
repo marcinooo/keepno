@@ -9,7 +9,7 @@ services:
     command: >
       bash -c "./scripts/wait_for_postgres.sh
       && python manage.py create_db
-      && python manage.py create_notes 15
+      && python manage.py create_notes 15 Dev pibermaw@gmail.com dev1234
       && python manage.py create_entries 150
       && flask run --host=0.0.0.0"
     ports:

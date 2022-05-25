@@ -1,0 +1,6 @@
+To activate {{ user.username }} account click link below: <br/>
+<a href="{{ url_for('accounts.activate_account', token=token, _external=True) }}">
+    Link to activate account
+</a>
+
+Keepno team

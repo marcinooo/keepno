@@ -5,7 +5,7 @@ from flask_migrate import Migrate
 from faker import Faker
 from datetime import datetime
 
-from app import create_app, db, notes_models
+from app import create_app, db, notes_models, accounts_models
 
 app = create_app()
 migrate = Migrate(app, db)
@@ -31,13 +31,25 @@ def create_db():
 
 @cli.command('create_notes')
 @click.argument('number_of_notes')
-def create_notes(number_of_notes):
+@click.argument('username')
+@click.argument('email')
+@click.argument('password')
+def create_notes(number_of_notes, username, email, password):
+    user = accounts_models.User.find_by_username(username)
+    if not user:
+        hashed_password = accounts_models.User.generate_password_hash(password)
+        user = accounts_models.User(username=username, email=email, password=hashed_password, active=True)
+        user.save_to_db()
+        profile = accounts_models.Profile(user=user)
+        profile.generate_gravatar_url()
+        profile.save_to_db()
     for _ in range(int(number_of_notes)):
         note = notes_models.Note(
             title=faker.text(max_nb_chars=50).title(),
             description=faker.text(max_nb_chars=150),
             created=faker.date_time_between(),
-            updated=faker.date_time_between()
+            updated=faker.date_time_between(),
+            user_id=user.id,
         )
         note.save_to_db()
 
@@ -54,6 +66,18 @@ def create_entries(number_of_entries):
             updated = faker.date_time_between()
         )
         entry.save_to_db()
+
+
+@cli.command('create_development_user')
+@click.argument('email')
+def delete_user(email):
+    user = accounts_models.User.find_by_email(email)
+    if not user:
+        user.profile.delete_from_db()
+        user.delete_from_db()
+        print('User was deleted.')
+    else:
+        print('No user for given e-mail.')
 
 
 if __name__ == "__main__":
