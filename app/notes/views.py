@@ -6,6 +6,8 @@ from flask import (
 )
 from flask.wrappers import Response
 from marshmallow.exceptions import ValidationError
+from flask_login import current_user
+
 
 from .errors_messages import (NO_DATA_TO_ADD, MISSING_JSON, NOTE_DOES_NOT_EXIST, ENTRY_DOES_NOT_EXIST)
 from .models import Note, Entry, PdfNote
@@ -22,7 +24,7 @@ def note(note_id: int) -> str:
     note = Note.get_by_id(note_id)
     if not note:
         abort(404)
-    number_of_notes = Note.count()
+    number_of_notes = Note.count_user_notes(current_user.id)
     return render_template('notes/note.html', note=note, number_of_notes=number_of_notes)
 
 
@@ -31,7 +33,7 @@ def note_export(note_id: int) -> str:
     note = Note.get_by_id(note_id)
     if not note:
         abort(404)
-    number_of_notes = Note.count()
+    number_of_notes = Note.count_user_notes(current_user.id)
     return render_template('notes/export_note.html', note=note, number_of_notes=number_of_notes)
 
     

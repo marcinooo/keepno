@@ -57,11 +57,21 @@ class Note(BaseMixin, db.Model):
     created = db.Column(db.DateTime(), default=datetime.datetime.utcnow)
     updated = db.Column(db.DateTime(), default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
     pdf_note = db.relationship('PdfNote', uselist=False, backref="note", cascade="all, delete")
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
     @classmethod
-    def count(cls) -> int:
+    def get_last_edited_note(cls):
+        return  cls.query.order_by(cls.updated.desc()).limit(1).first()
+
+    @classmethod
+    def count_all(cls) -> int:
         """Counts all objects in database."""
         return cls.query.count()
+
+    @classmethod
+    def count_user_notes(cls, user_id) -> int:
+        """Counts all objects in database."""
+        return cls.query.filter_by(user_id=user_id).count()
 
 
 class Entry(BaseMixin, db.Model):

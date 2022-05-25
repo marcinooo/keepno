@@ -11,3 +11,10 @@ redis
 celery
 python-dotenv
 pdfkit
+flask-login
+flask-bcrypt
+Flask-WTF
+Flask-Mail
+email_validator
+PyJWT
+Pillow

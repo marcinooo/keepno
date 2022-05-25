@@ -1,6 +1,7 @@
 """Contains config variables for keepno app."""
 
 import os
+import socket
 from pathlib import Path
 
 
@@ -13,7 +14,15 @@ BASEDIR = Path(__file__).parent.parent.resolve()
 
 
 # Debug
-FLASK_DEBUG = os.environ.get('FLASK_DEBUG')
+FLASK_DEBUG = True
+
+
+# Testing
+TESTING = False
+
+
+# Server name
+SERVER_NAME = '192.168.1.43:5000'
 
 
 # Database
@@ -53,6 +62,23 @@ CELERY_CONFIG = {
     'broker_url': REDIS_URL,
     'result_backend': REDIS_URL,
     'include': [
-        'app.notes.tasks'
+        'app.notes.tasks',
+        'app.accounts.tasks'
     ]
 }
+
+
+# Recaptcha
+RECAPTCHA_PUBLIC_KEY = os.environ.get('RECAPTCHA_PUBLIC_KEY')
+RECAPTCHA_PRIVATE_KEY = os.environ.get('RECAPTCHA_PRIVATE_KEY')
+RECAPTCHA_PARAMETERS = {'hl': 'en'}
+
+
+# Mail
+MAIL_SERVER = os.environ.get('MAIL_SERVER')
+MAIL_PORT = int(os.environ.get('MAIL_PORT'))
+MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS').lower() in ('true', '1', 't')
+MAIL_USE_SSL = os.environ.get('MAIL_USE_SSL').lower() in ('true', '1', 't')
+MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
+MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
+MAIL_OFFICIAL_SITE_ADDRESS = os.environ.get('MAIL_OFFICIAL_SITE_ADDRESS')
