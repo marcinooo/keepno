@@ -4,7 +4,7 @@
  * @param header text displaied before errors information
  * @returns prepared html body
  */
- function unpackReceivedError(error, header) {
+ export function unpackReceivedError(error, header) {
   const keys = Object.keys(error);
   let message = header + '<ul>';
   if(typeof error === 'string') {
@@ -27,3 +27,18 @@
   return message;
 }
   
+
+/** 
+ * Returns note id from url.
+ * @return id of note or empty string
+ */
+export function getNoteIdFromUrl() {
+  const url = window.location.href;
+  try {
+    const noteId = url.match(/notes\/\d+/g)[0].split('/')[1];
+    if (noteId.length > 0) {
+      return noteId[0];
+    }
+  } catch (error) { }
+  return '';
+}

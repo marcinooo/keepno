@@ -72,6 +72,7 @@ def add_note() -> Response:
         if data:
             try:
                 note = note_schema.load(data)
+                note.user_id = current_user.id
                 saved_note = note.save_to_db()
             except ValidationError as error:
                 return make_response(jsonify({'error': error.messages}), 400)
