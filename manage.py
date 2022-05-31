@@ -80,5 +80,11 @@ def delete_user(email):
         print('No user for given e-mail.')
 
 
+@cli.command('create_js')
+def create_js():
+    import subprocess
+    subprocess.run(["npm", "run", "build"], cwd='frontend_scripts')
+
+
 if __name__ == "__main__":
     cli()

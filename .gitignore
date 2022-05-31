@@ -159,6 +159,8 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 .idea/
 
+# Node JS modules
+frontend_scripts/node_modules/
 
 # PROJECT DIRECTORIES
 app/media/notes/img/

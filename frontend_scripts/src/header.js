@@ -1,5 +1,7 @@
-window.addEventListener('load', function() {
+import { alert } from './alerts';
+import { getNoteIdFromUrl, unpackReceivedError } from './utils';
 
+window.addEventListener('load', function() {
   const notesScroller = document.querySelector('#notes');
   const notesTemplate = document.querySelector('#notesTemplate');
   const notesLoadingSpiner = document.querySelector('#notesLoadingSpiner');
@@ -11,6 +13,7 @@ window.addEventListener('load', function() {
   /** Event triggered to load few notes from database to fill opened page. */
   const loadNotesAfterPageOpeningEvent = new Event('loadNotesAfterPageOpeningEvent');
 
+
   /**
    * Fills passed template with note's data
    * @param template template to fill
@@ -20,7 +23,7 @@ window.addEventListener('load', function() {
   function fillNoteTemplateClone(template, note) {
     template.querySelector("#noteTitle").innerHTML = note.title;
     template.querySelector("#noteDescription").innerHTML = note.description;
-    template.querySelector("#noteDate").innerHTML = moment(note.updated).format('MMM\xa0Do\xa0YY');
+    template.querySelector("#noteDate").innerHTML = note.updated;//moment(note.updated).format('MMM\xa0Do\xa0YY');
     template.querySelector("#noteLink").href = `/notes/${note.id}`;
     return template
   }
@@ -56,21 +59,6 @@ window.addEventListener('load', function() {
     templateClone = fillNoteTemplateClone(templateClone, note);
     scroller.insertBefore(templateClone, scroller.firstChild.nextSibling);
   }
-
-
-  /** 
-   * Returns note id from url.
-   * @return id of note or empty string
-   */
-  function getNoteIdFromUrl() {
-    const url = window.location.href;
-    const noteId = url.match(/notes\/\d+/g)[0].split('/')[1];
-    if (noteId.length > 0) {
-      return noteId[0]
-    }
-    return '';
-  }
-
 
   /**
    * Checks if sidebar's scrollbar is visible.
