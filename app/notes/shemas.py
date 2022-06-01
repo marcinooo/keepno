@@ -1,14 +1,18 @@
-"""Contains shemas."""
+"""
+Contains shemas for notes models.
+"""
 
 from marshmallow_sqlalchemy import auto_field, fields
-from marshmallow import pre_load, post_load, ValidationError
+from marshmallow import post_load, ValidationError
 
 from ..app import ma
 from .models import Entry, Note
 
 
 class NoteSchema(ma.SQLAlchemySchema):
-    class Meta:
+    """Creates schema for Note model."""
+
+    class Meta:  # pylint: disable=too-few-public-methods,missing-class-docstring
         model = Note
         include_relationships = True
         load_instance = True
@@ -20,14 +24,17 @@ class NoteSchema(ma.SQLAlchemySchema):
     updated = fields.fields.DateTime(format='iso')
 
     @post_load
-    def require_not_empty_title(self, note: Note, **kwargs) -> Note:
+    def require_not_empty_title(self, note: Note, **_) -> Note:  # pylint: disable=no-self-use
+        """Checks if title is not empty."""
         if not note.title:
             raise ValidationError('Note must have title.', 'title')
         return note
 
 
 class EntrySchema(ma.SQLAlchemySchema):
-    class Meta:
+    """Creates schema for Entry model."""
+
+    class Meta:  # pylint: disable=too-few-public-methods,missing-class-docstring
         model = Entry
         include_relationships = True
         load_instance = True
@@ -39,7 +46,8 @@ class EntrySchema(ma.SQLAlchemySchema):
     updated = fields.fields.DateTime(format='iso')
 
     @post_load
-    def require_not_empty_content(self, entry: Entry, **kwargs) -> Entry:
+    def require_not_empty_content(self, entry: Entry, **_) -> Entry:  # pylint: disable=no-self-use
+        """Checks if entry is not empty."""
         if not entry.content:
             raise ValidationError('Entry must have content.', 'content')
         return entry

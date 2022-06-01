@@ -2,9 +2,10 @@
 Contains utils for mailing.
 """
 
-from flask_mail import Message
-from .app import mail
 from typing import List
+from flask_mail import Message
+
+from .app import mail
 
 
 def send_email(subject: str, sender: str, recipients: List[str], text_body: str, html_body: str) -> None:

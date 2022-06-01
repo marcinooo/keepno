@@ -1,8 +1,8 @@
 """Contains two main functions to create keepno app."""
 
 import os
-from flask import Flask, render_template
 from pathlib import Path
+from flask import Flask
 from dotenv import load_dotenv
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
@@ -20,6 +20,7 @@ mail = Mail()
 
 
 def create_app() -> Flask:
+    """Main app function."""
     flask_env = os.environ.get('FLASK_ENV')
     if flask_env == 'development':
         env_file = Path(__file__).parent.absolute() / '..' / 'environment' / '.env.development'
@@ -28,7 +29,7 @@ def create_app() -> Flask:
     elif flask_env == 'testing':
         env_file = Path(__file__).parent.absolute() / '..' / 'environment' / '.env.testing'
     else:
-        raise NotImplemented('Please set "FLASK_ENV" variable to "development" or "production", or "testing".')
+        raise NotImplementedError('Please set "FLASK_ENV" variable to "development" or "production", or "testing".')
 
     load_dotenv(env_file)
 
@@ -46,8 +47,8 @@ def create_app() -> Flask:
     login_manager.login_view = 'accounts.login'
     mail.init_app(app)
 
-    from .notes import notes_blueprint
-    from .accounts import accounts_blueprint
+    from .notes import notes_blueprint  # pylint: disable=import-outside-toplevel
+    from .accounts import accounts_blueprint  # pylint: disable=import-outside-toplevel
     app.register_blueprint(notes_blueprint)
     app.register_blueprint(accounts_blueprint)
 
@@ -67,7 +68,8 @@ def create_celery_app(app=None):
     celery.conf.update(app.config.get('CELERY_CONFIG', {}))
     TaskBase = celery.Task
 
-    class ContextTask(TaskBase):
+    class ContextTask(TaskBase):  # pylint: disable=too-few-public-methods
+        """Creates task with current app context."""
         abstract = True
 
         def __call__(self, *args, **kwargs):
@@ -78,5 +80,6 @@ def create_celery_app(app=None):
     return celery
 
 
+# pylint: disable=wrong-import-position,unused-import
 from .notes import models as notes_models
 from .accounts import models as accounts_models

@@ -24,12 +24,12 @@ class BaseMixin:
     id = db.Column(db.Integer, primary_key=True)
 
     def save_to_db(self) -> None:
-        """Saves model to db."""
+        """Saves model to database."""
         db.session.add(self)
         db.session.commit()
 
     def delete_from_db(self) -> None:
-        """Deletes model from db."""
+        """Deletes model from database."""
         db.session.delete(self)
         db.session.commit()
 

@@ -1,4 +1,7 @@
-"""Contains models for database."""
+"""
+Contains models for notes blueprint.
+"""
+# pylint: disable=no-member
 
 from __future__ import annotations
 
@@ -11,17 +14,17 @@ from bs4 import BeautifulSoup
 from flask import current_app
 
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.orm import validates, reconstructor
+from sqlalchemy.orm import reconstructor
 from sqlalchemy import and_
 
 from ..app import db
 
 
-class BaseMixin(object):
-    """Contains methods for all models."""
+class BaseMixin:
+    """Base class which is common for other models."""
 
     @declared_attr
-    def __tablename__(cls) -> str:
+    def __tablename__(cls) -> str:  # pylint: disable=no-self-argument
         return cls.__name__.lower()
 
     id = db.Column(db.Integer, primary_key=True)
@@ -61,6 +64,7 @@ class Note(BaseMixin, db.Model):
 
     @classmethod
     def get_last_edited_note(cls):
+        """Gets last edited note from database."""
         return  cls.query.order_by(cls.updated.desc()).limit(1).first()
 
     @classmethod
@@ -70,7 +74,7 @@ class Note(BaseMixin, db.Model):
 
     @classmethod
     def count_user_notes(cls, user_id) -> int:
-        """Counts all objects in database."""
+        """Counts all objects for given user in database."""
         return cls.query.filter_by(user_id=user_id).count()
 
 
@@ -85,10 +89,11 @@ class Entry(BaseMixin, db.Model):
     def __init__(self, **kwargs) -> None:
         self._content_images_to_save = []
         self._content_images_to_delete = []
-        super(Entry, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     @reconstructor
     def init_on_load(self):
+        """Setupes on database-loaded instance before usage."""
         self._content_images_to_save = []
         self._content_images_to_delete = []
 
@@ -99,14 +104,14 @@ class Entry(BaseMixin, db.Model):
 
     @classmethod
     def get_by_note_id_in_order_of_creation(cls, _id: int) -> List[Entry]:
-        """."""
+        """Gets entries by note id in order of creation from database."""
         return cls.query.filter_by(note_id=_id).order_by(Entry.updated.desc()).all()
 
     @classmethod
     def count_for_given_note_id(cls, _id: int) -> int:
         """Counts all objects in database for given note id."""
         return cls.query.filter_by(note_id=_id).count()
-    
+
     def save_to_db(self) -> Entry:
         """Saves object to database."""
         super().save_to_db()
@@ -122,7 +127,7 @@ class Entry(BaseMixin, db.Model):
         return self
 
     def delete_from_db(self) -> Entry:
-        """Deletes model from database."""
+        """Deletes object from database."""
         content_images = EntryContentImage.get_by_entry_id(self.id)
         for image in content_images:
             image.delete()
@@ -165,7 +170,7 @@ class EntryContentImage(BaseMixin, db.Model):
     entry_id = db.Column(db.Integer, db.ForeignKey('entries.id'), nullable=False)
 
     def __init__(self, base64_string: str = '', **kwargs) -> None:
-        super(EntryContentImage, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.base64_string = base64_string
 
     @classmethod
@@ -204,14 +209,15 @@ class EntryContentImage(BaseMixin, db.Model):
         """Saves image in local os."""
         if not self.base64_string:
             raise TypeError('base64_string is needed to save image')
-        with open(path, "wb") as fh:
-            fh.write(base64.decodebytes(self.base64_string))
+        with open(path, "wb") as file:
+            file.write(base64.decodebytes(self.base64_string))
 
     def get_image_path(self) -> Path:
         """Returns path to image in local os."""
         return Path(current_app.config['MEDIA_ROOT']) / self.path / self.name
 
     def create_image_directory(self):
+        """Creates directory for image if it does not exists."""
         path = current_app.config['MEDIA_ROOT'] / self.path
         path.mkdir(parents=True, exist_ok=True)
 
@@ -224,6 +230,7 @@ class PdfNote(BaseMixin, db.Model):
     note_id = db.Column(db.Integer, db.ForeignKey('notes.id'))
 
     def refresh_creation_date(self):
+        """Refreshes pdf note creation date."""
         self.created = datetime.datetime.utcnow()
         self.save_to_db()
 
