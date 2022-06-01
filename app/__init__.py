@@ -1,3 +1,5 @@
+"""Main keepno module."""
+
 from .app import create_app, db, ma, notes_models, accounts_models
 from .notes.views import notes_blueprint
 

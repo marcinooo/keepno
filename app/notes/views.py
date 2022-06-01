@@ -1,27 +1,26 @@
-"""Contains notes views."""
+"""
+Contains view functions for notes blueprint.
+"""
 
-import json
 from flask import (
-    Blueprint, render_template, current_app, request, jsonify, make_response, abort, request, send_from_directory
+    Blueprint, render_template, current_app, request, jsonify, make_response, abort, send_from_directory
 )
 from flask.wrappers import Response
 from marshmallow.exceptions import ValidationError
 from flask_login import current_user
 
-
-from .errors_messages import (NO_DATA_TO_ADD, MISSING_JSON, NOTE_DOES_NOT_EXIST, ENTRY_DOES_NOT_EXIST)
-from .models import Note, Entry, PdfNote
+from .messages import (NO_DATA_TO_ADD, MISSING_JSON, NOTE_DOES_NOT_EXIST, ENTRY_DOES_NOT_EXIST)
+from .models import Note, Entry
 from .shemas import entry_schema, entries_schema, note_schema, notes_schema
 
 
-notes_blueprint = Blueprint('notes',
-                            __name__,
-                            template_folder='templates')
+notes_blueprint = Blueprint('notes', __name__, template_folder='templates')
 
 
 @notes_blueprint.route('/notes/<note_id>', methods=['GET'])
 def note(note_id: int) -> str:
-    note = Note.get_by_id(note_id)
+    """The view renders single note page."""
+    note = Note.get_by_id(note_id)  # pylint: disable=redefined-outer-name
     if not note:
         abort(404)
     number_of_notes = Note.count_user_notes(current_user.id)
@@ -30,29 +29,33 @@ def note(note_id: int) -> str:
 
 @notes_blueprint.route('/notes/<note_id>/export', methods=['GET'])
 def note_export(note_id: int) -> str:
-    note = Note.get_by_id(note_id)
+    """The view renders note export page where user can download note as pdf."""
+    note = Note.get_by_id(note_id)  # pylint: disable=redefined-outer-name
     if not note:
         abort(404)
     number_of_notes = Note.count_user_notes(current_user.id)
     return render_template('notes/export_note.html', note=note, number_of_notes=number_of_notes)
 
-    
+
 @notes_blueprint.route('/media/notes/img/<year>/<month>/<day>/<filename>')
 def media_notes_img(year: str, month: str, day: str, filename: str) -> Response:
+    """The view returns note image."""
     image_path = current_app.config['MEDIA_ROOT'] / 'notes' / 'img' / year / month / day
     return send_from_directory(image_path, filename)
 
 
 @notes_blueprint.route('/media/notes/pdf/<filename>')
 def media_notes_pdf(filename: str) -> Response:
+    """The view returns note pdf file."""
     return send_from_directory(current_app.config['MEDIA_NOTES_PDF'], filename, as_attachment=True)
 
 
 @notes_blueprint.route('/api/notes', methods=['GET'])
 def load_notes() -> Response:
+    """The view returns list of notes as json object."""
     page = request.args.get('npage', 1, type=int)
     pagination = Note.query.order_by(Note.updated.desc()).paginate(
-        page, 
+        page,
         per_page=current_app.config['NOTES_PER_PAGE'],
         error_out=False
     )
@@ -67,11 +70,12 @@ def load_notes() -> Response:
 
 @notes_blueprint.route('/api/notes', methods=['POST'])
 def add_note() -> Response:
+    """The view addes new note."""
     if request.is_json:
         data = request.get_json()
         if data:
             try:
-                note = note_schema.load(data)
+                note = note_schema.load(data)  # pylint: disable=redefined-outer-name
                 note.user_id = current_user.id
                 saved_note = note.save_to_db()
             except ValidationError as error:
@@ -83,6 +87,7 @@ def add_note() -> Response:
 
 @notes_blueprint.route('/api/notes/<note_id>/entries', methods=['GET'])
 def load_entries(note_id: int) -> Response:
+    """The view returns list of entries as json object."""
     if not Entry.get_by_note_id(note_id):
         return make_response(jsonify({'error': ENTRY_DOES_NOT_EXIST}), 404)
     page = request.args.get('epage', 1, type=int)
@@ -102,6 +107,7 @@ def load_entries(note_id: int) -> Response:
 
 @notes_blueprint.route('/api/notes/<note_id>/entries', methods=['POST'])
 def add_entry(note_id: int) -> Response:
+    """The view addes new entry."""
     if not Note.get_by_id(note_id):
         return make_response(jsonify({'error': NOTE_DOES_NOT_EXIST}), 404)
     if request.is_json:
@@ -120,6 +126,7 @@ def add_entry(note_id: int) -> Response:
 
 @notes_blueprint.route('/api/notes/<note_id>/entries/<entry_id>', methods=['PUT'])
 def update_entry(note_id: int, entry_id: int) -> Response:
+    """The view updates entry."""
     if not Note.get_by_id(note_id):
         return make_response(jsonify({'error': NOTE_DOES_NOT_EXIST}), 404)
     entry = Entry.get_by_id(entry_id)
@@ -141,6 +148,7 @@ def update_entry(note_id: int, entry_id: int) -> Response:
 
 @notes_blueprint.route('/api/notes/<note_id>/entries/<entry_id>', methods=['DELETE'])
 def delete_entry(note_id: int, entry_id: int) -> Response:
+    """The view deletes entry."""
     if not Note.get_by_id(note_id):
         return make_response(jsonify({'error': NOTE_DOES_NOT_EXIST}), 404)
     entry = Entry.get_by_id(entry_id)
@@ -153,17 +161,19 @@ def delete_entry(note_id: int, entry_id: int) -> Response:
 
 @notes_blueprint.route('/api/notes/<note_id>/export/pdf', methods=['GET'])
 def note_export_pdf(note_id: int) -> str:
-    note = Note.get_by_id(note_id)
+    """The view generates note pdf."""
+    note = Note.get_by_id(note_id)  # pylint: disable=redefined-outer-name
     if not note:
         return make_response(jsonify({'error': NOTE_DOES_NOT_EXIST}), 404)
-    from .tasks import generate_note_pdf
+    from .tasks import generate_note_pdf  # pylint: disable=import-outside-toplevel
     result = generate_note_pdf.delay(note.id)
     return make_response(jsonify({'report_status': 'started', 'task_id': result.id}), 200)
 
 
 @notes_blueprint.route('/api/task/<task_id>', methods=['GET'])
 def task_progress(task_id: str) -> str:
-    from .tasks import generate_note_pdf
+    """The view shows background task progress."""
+    from .tasks import generate_note_pdf  # pylint: disable=import-outside-toplevel
     task = generate_note_pdf.AsyncResult(task_id)
     status = task.status
     progress = 0

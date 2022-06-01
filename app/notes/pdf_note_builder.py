@@ -62,8 +62,8 @@ class PdfNoteBuilder:
             raise Exception('Header is not added')
         self._template = self._render_template({'entry_template': ''})
         prepared_template = self._template.render()
-        with open('test.html', 'w') as fd:
-            fd.write(prepared_template)
+        with open('test.html', 'w', encoding='utf-8') as file:
+            file.write(prepared_template)
         pdfkit.from_string(prepared_template, name, self.options)
 
     def _render_template(self, context: dict) -> Template:
