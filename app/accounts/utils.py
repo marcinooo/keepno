@@ -88,9 +88,8 @@ class UniqueEmail:  # pylint: disable=too-few-public-methods
         user = User.find_by_email(email)
         if user:
             if self.skip_current_user:
-                if user.email != current_user.email:
-                    raise ValidationError(self.message)
-            else:
+                raise ValidationError(self.message)
+            if user.email != current_user.email:
                 raise ValidationError(self.message)
 
 
@@ -109,9 +108,8 @@ class UniqueUsername:  # pylint: disable=too-few-public-methods
         user = User.find_by_username(username)
         if user:
             if self.skip_current_user:
-                if user.username != current_user.username:
-                    raise ValidationError(self.message)
-            else:
+                raise ValidationError(self.message)
+            if user.username != current_user.username:
                 raise ValidationError(self.message)
 
 
@@ -170,5 +168,7 @@ def redirect_to_last_updated_note() -> Response:
     Redirects user to last edited note.
     :return: redirection
     """
-    last_edited_note = Note.get_last_edited_note()
+    last_edited_note = Note.get_last_edited_note(current_user.id)
+    if last_edited_note is None:
+        return redirect(url_for('notes.add_first_note'))
     return redirect(url_for('notes.note', note_id=last_edited_note.id))

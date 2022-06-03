@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}<title>Keepno</title>{% endblock %}
+
+{% block style %}
+{% endblock %}
+
+
+{% block content %}
+
+{% include "includes/header.html" %}
+
+<!-- MAIN PAGE START -->
+<div class="jumbotron my-3">
+  <div class="container">
+    <div class="row d-flex justify-content-center align-items-center" style="margin-top: 80px;">
+      <div class="col-md-6 col-lg-6 col-xl-6">
+        <div class="card rounded-3 text-black">
+          <div class="card-body mx-md-4 my-4 pb-1">
+            <div class="mb-4">
+              <div class="text-center">
+              <p class="lead">Your first note</p>
+            </div>
+              <form method="POST" id="addFirstNoteForm">
+                {{ form.csrf_token }}
+                <div class="form-outline mb-2">
+                {{ form.title.label(class_="form-label") }}
+                {{ form.title(class_="form-control", id_="firstNoteTitle", placeholder="Enter your note title") }}
+                {% for error in form.title.errors %}
+                <span>{{ error }}</span>
+                {% endfor %}
+                </div>
+                <div class="form-outline mb-2">
+                {{ form.description.label(class_="form-label") }}
+                {{ form.description(class_="form-control", id_="firstNoteDescription", placeholder="Enter short description") }}
+                {% for error in form.description.errors %}
+                <span>{{ error }}</span>
+                {% endfor %}
+                </div>
+                <div class="text-center mb-2">
+                  <div class="d-grid gap-2">
+                    <button class="btn btn-dark mb-2" type="submit">Add note</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- MAIN PAGE END -->
+
+{% endblock %}
+
+
+{% block js %}
+
+<script src="{{ url_for('static', filename='js/header.bundle.js') }}"></script>
+
+{% endblock %}

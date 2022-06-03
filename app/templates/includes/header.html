@@ -32,7 +32,11 @@
 <!-- SIDEBAR START -->
 <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
   <div class="offcanvas-header">
+    {% if number_of_notes %}
     <h5 class="offcanvas-title" id="offcanvasExampleLabel">My notes<span class="text-secondary"> ({{ number_of_notes }})</span></h5>
+    {% else %}
+    <h5 class="offcanvas-title" id="offcanvasExampleLabel">My notes<span class="text-secondary"> (0)</span></h5>
+    {% endif %}
     <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
   <div class="d-grid gap-2 m-3">

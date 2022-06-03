@@ -12,10 +12,10 @@ from typing import List
 from pathlib import Path
 from bs4 import BeautifulSoup
 from flask import current_app
-
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import reconstructor
 from sqlalchemy import and_
+from sqlalchemy import exc
 
 from ..app import db
 
@@ -44,12 +44,20 @@ class BaseMixin:
     @classmethod
     def get_all(cls) -> List[BaseMixin]:
         """Gets all objects from database."""
-        return cls.query.all()
+        try:
+            return cls.query.all()
+        except exc.SQLAlchemyError as error:
+            db.session.rollback()
+            return None
 
     @classmethod
     def get_by_id(cls, _id) -> BaseMixin:
         """Gets single object by id from database."""
-        return cls.query.filter_by(id=_id).first()
+        try:
+            return cls.query.filter_by(id=_id).first()
+        except exc.SQLAlchemyError as error:
+            db.session.rollback()
+            return None
 
 
 class Note(BaseMixin, db.Model):
@@ -63,9 +71,9 @@ class Note(BaseMixin, db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
     @classmethod
-    def get_last_edited_note(cls):
-        """Gets last edited note from database."""
-        return  cls.query.order_by(cls.updated.desc()).limit(1).first()
+    def get_last_edited_note(cls, user_id):
+        """Gets last edited note from database for given user."""
+        return  cls.query.filter_by(user_id=user_id).order_by(cls.updated.desc()).limit(1).first()
 
     @classmethod
     def count_all(cls) -> int:

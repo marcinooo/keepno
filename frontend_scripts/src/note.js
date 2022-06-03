@@ -126,7 +126,7 @@ window.addEventListener('load', function() {
           return response.json();
         })
         .then(function(data) {
-          unpackReceivedEntriesData(data);
+          unpackReceivedEntriesData(data); 
         })
         .catch(function (error) {
           console.log(error);
@@ -146,8 +146,14 @@ window.addEventListener('load', function() {
           return response.json();
         })
         .then(function(data) {
-          unpackReceivedEntriesData(data);
-          if (! documentScrollbarIsActive()) {
+          if (data.entries) {
+            unpackReceivedEntriesData(data); 
+          } else {
+            alert.warning(data.error);
+            hasNextEntries = false;
+            entriesLoadingSpiner.style.display = "none";
+          }
+          if (! documentScrollbarIsActive() && ! data.error) {
             document.dispatchEvent(loadEntriesAfterPageOpeningEvent);
           } else {
             intersectionObserver.observe(entriesLoadingSpiner);

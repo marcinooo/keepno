@@ -14,7 +14,7 @@ pdfkit
 flask-login
 flask-bcrypt
 Flask-WTF
-Flask-Mail
 email_validator
 PyJWT
 Pillow
+boto3

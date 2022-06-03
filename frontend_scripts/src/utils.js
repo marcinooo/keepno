@@ -35,10 +35,9 @@
 export function getNoteIdFromUrl() {
   const url = window.location.href;
   try {
+    console.log(url.match(/notes\/\d+/g)[0].split('/'));
     const noteId = url.match(/notes\/\d+/g)[0].split('/')[1];
-    if (noteId.length > 0) {
-      return noteId[0];
-    }
+    return noteId;
   } catch (error) { }
   return '';
 }
