@@ -14,11 +14,11 @@ BASEDIR = Path(__file__).parent.parent.resolve()
 
 
 # Debug
-FLASK_DEBUG = True
+FLASK_DEBUG = os.environ.get('FLASK_DEBUG')
 
 
 # Testing
-TESTING = False
+TESTING = os.environ.get('TESTING')
 
 
 # Server name
@@ -82,3 +82,19 @@ MAIL_USE_SSL = os.environ.get('MAIL_USE_SSL').lower() in ('true', '1', 't')
 MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
 MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
 MAIL_OFFICIAL_SITE_ADDRESS = os.environ.get('MAIL_OFFICIAL_SITE_ADDRESS')
+
+
+# AWS
+AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+AWS_REGION = os.environ.get('AWS_REGION')
+
+
+if TESTING:
+    # WFT form extension
+    WTF_CSRF_METHODS = []
+    WTF_CSRF_ENABLED = False
+    # Celery
+    CELERY_ALWAYS_EAGER = True
+    CELERY_EAGER_PROPAGATES_EXCEPTIONS = True
+    BROKER_BACKEND = 'memory'

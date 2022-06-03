@@ -3,15 +3,18 @@ Contains view functions for notes blueprint.
 """
 
 from flask import (
-    Blueprint, render_template, current_app, request, jsonify, make_response, abort, send_from_directory
+    Blueprint, render_template, current_app, request, jsonify, make_response, abort, send_from_directory, redirect,
+    url_for, flash
 )
 from flask.wrappers import Response
 from marshmallow.exceptions import ValidationError
 from flask_login import current_user
 
-from .messages import (NO_DATA_TO_ADD, MISSING_JSON, NOTE_DOES_NOT_EXIST, ENTRY_DOES_NOT_EXIST)
+from .messages import (NO_DATA_TO_ADD, MISSING_JSON, NOTE_DOES_NOT_EXIST, ENTRY_DOES_NOT_EXIST, FIRST_NOTE_CREATED)
 from .models import Note, Entry
 from .shemas import entry_schema, entries_schema, note_schema, notes_schema
+from .forms import AddFirstNoteForm
+from ..accounts.utils import redirect_to_last_updated_note
 
 
 notes_blueprint = Blueprint('notes', __name__, template_folder='templates')
@@ -21,7 +24,7 @@ notes_blueprint = Blueprint('notes', __name__, template_folder='templates')
 def note(note_id: int) -> str:
     """The view renders single note page."""
     note = Note.get_by_id(note_id)  # pylint: disable=redefined-outer-name
-    if not note:
+    if not note or note.user_id != current_user.id:
         abort(404)
     number_of_notes = Note.count_user_notes(current_user.id)
     return render_template('notes/note.html', note=note, number_of_notes=number_of_notes)
@@ -31,10 +34,27 @@ def note(note_id: int) -> str:
 def note_export(note_id: int) -> str:
     """The view renders note export page where user can download note as pdf."""
     note = Note.get_by_id(note_id)  # pylint: disable=redefined-outer-name
-    if not note:
+    if not note or note.user_id != current_user.id:
         abort(404)
     number_of_notes = Note.count_user_notes(current_user.id)
     return render_template('notes/export_note.html', note=note, number_of_notes=number_of_notes)
+
+
+@notes_blueprint.route('/note/first', methods=['GET', 'POST'])
+def add_first_note():
+    """The view renders page to add first note."""
+    number_of_notes = Note.count_user_notes(current_user.id)
+    if number_of_notes:
+        return redirect_to_last_updated_note()
+    form = AddFirstNoteForm()
+    if form.validate_on_submit():
+        note = Note(title=form.title.data,  # pylint: disable=redefined-outer-name
+                    description=form.description.data,
+                    user_id=current_user.id)
+        note.save_to_db()
+        flash(FIRST_NOTE_CREATED, 'error')
+        return redirect(url_for('notes.note', note_id=note.id))
+    return render_template('notes/add_first_note.html', form=form)
 
 
 @notes_blueprint.route('/media/notes/img/<year>/<month>/<day>/<filename>')
@@ -54,7 +74,7 @@ def media_notes_pdf(filename: str) -> Response:
 def load_notes() -> Response:
     """The view returns list of notes as json object."""
     page = request.args.get('npage', 1, type=int)
-    pagination = Note.query.order_by(Note.updated.desc()).paginate(
+    pagination = Note.query.filter_by(user_id=current_user.id).order_by(Note.updated.desc()).paginate(
         page,
         per_page=current_app.config['NOTES_PER_PAGE'],
         error_out=False
@@ -89,7 +109,7 @@ def add_note() -> Response:
 def load_entries(note_id: int) -> Response:
     """The view returns list of entries as json object."""
     if not Entry.get_by_note_id(note_id):
-        return make_response(jsonify({'error': ENTRY_DOES_NOT_EXIST}), 404)
+        return make_response(jsonify({'error': 'No entries.'}), 200)
     page = request.args.get('epage', 1, type=int)
     pagination = Entry.query.filter_by(note_id=note_id).order_by(Entry.created.desc()).paginate(
         page,

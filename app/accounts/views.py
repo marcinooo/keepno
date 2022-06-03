@@ -196,7 +196,7 @@ def reset_password_email_sent() -> str:
     return render_template('accounts/reset_password_email_sent.html')
 
 
-@accounts_blueprint.route('/password-reset/<token>', methods=['GET', 'POST'])
+@accounts_blueprint.route('/reset-password/<token>', methods=['GET', 'POST'])
 def reset_password(token: str) -> str:
     """The view resets user password."""
     user = User.verify_jwt_token(token)

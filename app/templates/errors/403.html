@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}<title>Keepno</title>{% endblock %}
+
+{% block style %}
+{% endblock %}
+
+
+{% block content %}
+
+<!-- MAIN PAGE START -->
+<div class="jumbotron d-flex align-items-center min-vh-100">
+  <div class="container">
+    <div class="row d-flex justify-content-center align-items-center">
+      <div class="col-md-6 col-lg-6 col-xl-6">
+        <div class="card rounded-3 text-black">
+          <div class="card-body mx-md-4 my-4">
+            <div class="text-center">
+                <h1 class="display-1 fw-bold">403</h1>
+                <p class="fs-3"> <span class="text-danger">Opps!</span> Forbidden.</p>
+                <p class="lead">Not this time, access forbidden!</p>
+                <a href="{{ return_url }}" role="button" class="btn btn-outline-danger btn-sm">{{ return_message }}</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- MAIN PAGE END -->
+
+{% endblock %}
+
+
+{% block js %}
+{% endblock %}

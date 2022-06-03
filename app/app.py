@@ -8,15 +8,16 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
-from flask_mail import Mail
 from celery import Celery
+
+from .mail import SES
 
 
 db = SQLAlchemy()
 ma = Marshmallow()
 bcrypt = Bcrypt()
 login_manager = LoginManager()
-mail = Mail()
+ses = SES()
 
 
 def create_app() -> Flask:
@@ -45,12 +46,14 @@ def create_app() -> Flask:
     bcrypt.init_app(app)
     login_manager.init_app(app)
     login_manager.login_view = 'accounts.login'
-    mail.init_app(app)
+    ses.init_app(app)
 
     from .notes import notes_blueprint  # pylint: disable=import-outside-toplevel
     from .accounts import accounts_blueprint  # pylint: disable=import-outside-toplevel
+    from .views import register_error_handlers  # pylint: disable=import-outside-toplevel
     app.register_blueprint(notes_blueprint)
     app.register_blueprint(accounts_blueprint)
+    register_error_handlers(app)
 
     return app
 
